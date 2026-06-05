@@ -40,6 +40,7 @@ export default async function EditSupplierPage({ params }: PageProps) {
           <Link
             href={`/suppliers/${supplier.slug}`}
             target="_blank"
+            rel="noopener noreferrer"
             className="text-[var(--brand)] hover:underline"
           >
             צפה בדף ציבורי ↗

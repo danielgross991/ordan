@@ -47,6 +47,7 @@ export default async function SupplierDashboardPage() {
                   <Link
                     href={`/suppliers/${claimedSupplier.slug}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-xs px-3 py-1.5 bg-[var(--brand-light)] text-[var(--brand)] rounded-lg font-medium hover:bg-[var(--brand)] hover:text-white transition-colors"
                   >
                     צפה בדף הציבורי ↗

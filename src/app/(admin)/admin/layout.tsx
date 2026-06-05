@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/options'
 import { isDbConfigured } from '@/lib/db/client'
@@ -6,6 +7,10 @@ import { AdminSignOutButton } from './AdminSignOutButton'
 import { AdminMobileNav } from './AdminMobileNav'
 import { AdminSidebar } from './AdminSidebar'
 import { OrdanLogo } from '@/components/public/OrdanLogo'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
@@ -37,7 +42,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 text-sm flex-shrink-0">
-          <Link href="/" target="_blank" className="text-white/75 hover:text-white text-xs hidden sm:block">
+          <Link href="/" target="_blank" rel="noopener noreferrer" className="text-white/75 hover:text-white text-xs hidden sm:block">
             צפה באתר
           </Link>
           <AdminSignOutButton />

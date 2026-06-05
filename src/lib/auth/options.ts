@@ -3,7 +3,9 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
 import bcrypt from 'bcryptjs'
 import { createOrUpdateUser, getUserByEmail } from '@/lib/db/users'
-import { checkRateLimit, getRateLimitKey } from '@/lib/security/rateLimit'
+import { checkRateLimit, getClientIp, getRateLimitKey } from '@/lib/security/rateLimit'
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isStrictProduction = isProduction && (process.env.VERCEL_ENV === 'production' || process.env.ORDAN_ENFORCE_PROD_ENV === 'true')
@@ -37,10 +39,20 @@ export const authOptions: NextAuthOptions = {
         username: { label: 'שם משתמש', type: 'text' },
         password: { label: 'סיסמה', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.username || !credentials?.password) return null
         if (credentials.username.length > 120 || credentials.password.length > 300) return null
-        if (!checkRateLimit(getRateLimitKey('admin-login', credentials.username), 10, 15 * 60 * 1000)) return null
+
+        const ip = getClientIp(req?.headers ?? {})
+        // Per-IP guard against username spraying (stricter than per-username)
+        if (!checkRateLimit(getRateLimitKey('admin-login-ip', ip), 20, 15 * 60 * 1000)) {
+          await sleep(800)
+          return null
+        }
+        if (!checkRateLimit(getRateLimitKey('admin-login', credentials.username), 10, 15 * 60 * 1000)) {
+          await sleep(800)
+          return null
+        }
 
         const expectedUsername = process.env.ADMIN_USERNAME
         const expectedHash = process.env.ADMIN_PASSWORD_HASH
@@ -50,17 +62,30 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (credentials.username !== expectedUsername) return null
-
-        const valid = await bcrypt.compare(credentials.password, expectedHash)
-        if (!valid) return null
+        // Always run bcrypt to keep timing constant whether username matches or not.
+        // Use a dummy hash of equivalent cost when the username is wrong.
+        const dummyHash = '$2b$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmnopqrstuvwxyz'
+        const usernameMatches = credentials.username === expectedUsername
+        const hashToCompare = usernameMatches ? expectedHash : dummyHash
+        const valid = await bcrypt.compare(credentials.password, hashToCompare)
+        if (!valid || !usernameMatches) {
+          await sleep(300)
+          return null
+        }
 
         return { id: '1', name: 'Admin', email: 'admin@ordan.local' }
       },
     }),
   ],
 
-  session: { strategy: 'jwt' },
+  session: {
+    strategy: 'jwt',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // refresh once per day
+  },
+  jwt: {
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  },
   useSecureCookies: isProduction,
   cookies: isProduction
     ? {
