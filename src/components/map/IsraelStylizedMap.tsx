@@ -149,11 +149,10 @@ export function IsraelStylizedMap({
           </div>
         </div>
 
-        <div className="relative bg-[linear-gradient(115deg,#dff3ff_0%,#eef8fb_24%,#fbfaf6_58%,#f5f2ea_100%)] px-2 py-5 md:px-8 md:py-8">
-          <div className="pointer-events-none absolute bottom-0 left-0 top-0 w-[38%] bg-[#bfe5f8]/45" />
+        <div className="relative overflow-hidden bg-[radial-gradient(120%_80%_at_18%_45%,#c9e8f8_0%,#dff1fb_28%,#eaf2f0_55%,#f4ead8_80%,#ecd9b8_100%)] px-2 py-5 md:px-8 md:py-8">
           <svg
             viewBox={`0 0 ${VIEWBOX.width} ${VIEWBOX.height}`}
-            className="relative mx-auto block h-[600px] max-h-[73vh] w-full max-w-[390px] drop-shadow-[0_24px_34px_rgba(23,39,69,0.16)] md:h-[720px] md:max-w-[520px]"
+            className="relative mx-auto block h-[600px] max-h-[73vh] w-full max-w-[390px] md:h-[720px] md:max-w-[520px]"
             role="img"
             aria-label="מפת אזורי אספקה בישראל"
           >
@@ -164,22 +163,86 @@ export function IsraelStylizedMap({
                 ))}
               </clipPath>
               <filter id="israelOutlineShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="9" stdDeviation="8" floodColor="#172745" floodOpacity="0.14" />
+                <feDropShadow dx="0" dy="10" stdDeviation="9" floodColor="#172745" floodOpacity="0.18" />
               </filter>
+              <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
+              <filter id="regionSoftBlend" x="-5%" y="-5%" width="110%" height="110%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="0.7" result="blur" />
+                <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+              </filter>
+              <radialGradient id="seaShimmer" cx="22%" cy="38%" r="55%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
+                <stop offset="60%" stopColor="#ffffff" stopOpacity="0.05" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="israelGlow" cx="50%" cy="50%" r="55%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+                <stop offset="60%" stopColor="#ffffff" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+              </radialGradient>
+              <linearGradient id="landTexture" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#fffdf5" />
+                <stop offset="100%" stopColor="#f7eedb" />
+              </linearGradient>
+              <pattern id="waveDots" x="0" y="0" width="14" height="14" patternUnits="userSpaceOnUse">
+                <circle cx="7" cy="7" r="0.9" fill="#2d6c92" fillOpacity="0.18" />
+              </pattern>
+              <pattern id="sandDots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                <circle cx="8" cy="8" r="0.8" fill="#b88e4a" fillOpacity="0.16" />
+              </pattern>
             </defs>
 
+            {/* Sea texture on the west */}
+            <rect x="0" y="0" width={VIEWBOX.width * 0.42} height={VIEWBOX.height} fill="url(#waveDots)" />
+            <rect x="0" y="0" width={VIEWBOX.width * 0.5} height={VIEWBOX.height} fill="url(#seaShimmer)" />
+
+            {/* Sand/desert texture on the east */}
+            <rect x={VIEWBOX.width * 0.55} y="0" width={VIEWBOX.width * 0.45} height={VIEWBOX.height} fill="url(#sandDots)" />
+
+            {/* Neighbor country labels - subtle */}
+            <text x={VIEWBOX.width * 0.78} y={45} textAnchor="middle" fontSize="11" fontWeight="700" fill="#a08054" opacity="0.55" letterSpacing="2">לבנון</text>
+            <text x={VIEWBOX.width * 0.88} y={140} textAnchor="middle" fontSize="11" fontWeight="700" fill="#a08054" opacity="0.55" letterSpacing="2">סוריה</text>
+            <text x={VIEWBOX.width * 0.92} y={340} textAnchor="middle" fontSize="12" fontWeight="700" fill="#a08054" opacity="0.6" letterSpacing="2">ירדן</text>
+            <text x={VIEWBOX.width * 0.20} y={680} textAnchor="middle" fontSize="12" fontWeight="700" fill="#a08054" opacity="0.55" letterSpacing="2">מצרים</text>
+
+            {/* Sea label */}
+            <g opacity="0.7" transform={`translate(${VIEWBOX.width * 0.12}, 240) rotate(-78)`}>
+              <text textAnchor="middle" fontSize="13" fontWeight="800" fill="#2d6c92" letterSpacing="6">הים התיכון</text>
+            </g>
+
+            {/* Compass rose */}
+            <g transform={`translate(${VIEWBOX.width - 38}, ${VIEWBOX.height - 56})`} opacity="0.7">
+              <circle r="18" fill="#ffffff" stroke="#172745" strokeOpacity="0.25" strokeWidth="1" />
+              <path d="M 0 -13 L 3 0 L 0 13 L -3 0 Z" fill="#172745" fillOpacity="0.75" />
+              <text y="-19" textAnchor="middle" fontSize="9" fontWeight="900" fill="#172745" fillOpacity="0.75">N</text>
+            </g>
+
+            {/* Soft glow around Israel */}
+            <g filter="url(#softGlow)" opacity="0.85">
+              {outlinePaths.map((path, index) => (
+                <path key={`glow-${index}`} d={path} fill="url(#israelGlow)" />
+              ))}
+            </g>
+
+            {/* Israel land base with shadow */}
             <g filter="url(#israelOutlineShadow)">
               {outlinePaths.map((path, index) => (
                 <path
                   key={index}
                   d={path}
-                  fill="rgba(255,255,255,0.84)"
+                  fill="url(#landTexture)"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
                   strokeLinejoin="round"
                 />
               ))}
             </g>
 
-            <g clipPath="url(#israelRealOutlineClip)">
+            <g clipPath="url(#israelRealOutlineClip)" filter="url(#regionSoftBlend)">
               {regions.map(region => {
                 const selected = selectedRegionId === region.id
                 const [labelXRaw, labelYRaw] = projectLatLng(region.center)
@@ -192,15 +255,14 @@ export function IsraelStylizedMap({
                     key={region.id}
                     d={pathFromLatLng(region.polygon)}
                     onClick={() => onSelectRegion(region.id, 'manual')}
-                    className="cursor-pointer transition-all duration-200 ease-out hover:brightness-[1.04]"
+                    className="cursor-pointer transition-all duration-200 ease-out hover:brightness-[1.06]"
                     fill={region.color}
-                    fillOpacity={selected ? 0.94 : 0.74}
-                    stroke={selected ? '#172745' : '#ffffff'}
-                    strokeWidth={selected ? 4.4 : 3.2}
+                    fillOpacity={selected ? 0.96 : 0.82}
+                    stroke={selected ? '#172745' : region.color}
+                    strokeOpacity={selected ? 1 : 0.55}
+                    strokeWidth={selected ? 3.2 : 1.4}
                     strokeLinejoin="round"
                     style={{
-                      filter: selected ? 'drop-shadow(0 10px 15px rgba(23,39,69,0.23))' : undefined,
-                      transform: selected ? 'translateY(-2px)' : undefined,
                       transformOrigin: `${labelX}px ${labelY}px`,
                     }}
                   >
@@ -209,6 +271,35 @@ export function IsraelStylizedMap({
                 )
               })}
             </g>
+
+            {/* Clean outline on top of regions */}
+            <g clipPath="url(#israelRealOutlineClip)" pointerEvents="none">
+              {outlinePaths.map((path, index) => (
+                <path
+                  key={`outline-top-${index}`}
+                  d={path}
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeOpacity="0.6"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+              ))}
+            </g>
+
+            {/* Final crisp Israel border */}
+            {outlinePaths.map((path, index) => (
+              <path
+                key={`border-${index}`}
+                d={path}
+                fill="none"
+                stroke="#172745"
+                strokeOpacity="0.32"
+                strokeWidth="1.4"
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+            ))}
             {regions.map(region => {
               const selected = selectedRegionId === region.id
               const [labelXRaw, labelYRaw] = projectLatLng(region.center)
