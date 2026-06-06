@@ -63,28 +63,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Logo marquee ─────────────────────────────────── */}
-      <LogoMarquee suppliers={allSuppliers} />
-
       <div className="max-w-6xl mx-auto px-4 pt-7 pb-12 md:pt-8 md:pb-14 space-y-9 md:space-y-10">
 
-        {/* ── Categories ──────────────────────────────────── */}
+        {/* ── Categories (above the fold) ─────────────────── */}
         <section>
           <SectionHeader title="מה צריך למצוא?" linkHref="/suppliers" linkLabel="כל הספקים" />
           <CategoryRail categories={categories} />
         </section>
 
-        <section>
-          <DiscoveryGrid />
-        </section>
-
-        {/* ── Featured suppliers ──────────────────────────── */}
+        {/* ── Featured suppliers (above the fold) ─────────── */}
         {featuredSuppliers.length > 0 && (
           <section>
             <SectionHeader title="ספקים מובחרים" linkHref="/suppliers?featured=true" linkLabel="לכל הספקים" />
             <SupplierRail suppliers={featuredSuppliers} />
           </section>
         )}
+
+        {/* ── Regions ─────────────────────────────────────── */}
+        <section>
+          <SectionHeader title="עיין לפי אזור" />
+          <RegionRail regions={regions} />
+        </section>
 
         {/* ── Verified suppliers ──────────────────────────── */}
         {verifiedSuppliers.length > 0 && (
@@ -94,8 +93,8 @@ export default async function HomePage() {
           </section>
         )}
 
-        {/* ── Per-category discovery rails ─────────────────── */}
-        {categoryRails.map(({ category, suppliers }) => (
+        {/* ── Per-category discovery rails (limited to 2) ── */}
+        {categoryRails.slice(0, 2).map(({ category, suppliers }) => (
           <section key={category.id}>
             <SectionHeader
               title={`ספקים — ${category.labelHe}`}
@@ -106,11 +105,8 @@ export default async function HomePage() {
           </section>
         ))}
 
-        {/* ── Regions ─────────────────────────────────────── */}
-        <section>
-          <SectionHeader title="עיין לפי אזור" />
-          <RegionRail regions={regions} />
-        </section>
+        {/* ── Logo marquee (moved down — decorative) ──────── */}
+        <LogoMarquee suppliers={allSuppliers} />
 
         {/* ── All recent suppliers ─────────────────────────── */}
         {recentSuppliers.length > 0 && (
@@ -189,47 +185,6 @@ function IntentRail() {
           </Link>
         ))}
       </div>
-    </div>
-  )
-}
-
-function DiscoveryGrid() {
-  const items = [
-    {
-      title: 'מזון וחומרי גלם',
-      text: 'יצרנים, יבואנים, סיטונאים ומפיצים למסעדות ומטבחים.',
-      href: '/suppliers?category=מזון',
-      cta: 'לספקי מזון',
-    },
-    {
-      title: 'ציוד ותפעול',
-      text: 'ציוד מטבח, אריזות, ניקיון ופתרונות תפעול לעסק.',
-      href: '/suppliers?category=ציוד מטבח',
-      cta: 'לציוד ותפעול',
-    },
-    {
-      title: 'שירותים לעסק',
-      text: 'ספקי שירות, תמיכה, תחזוקה ופתרונות לעסקי אירוח.',
-      href: '/suppliers?category=שירותים לעסקים',
-      cta: 'לשירותים',
-    },
-  ]
-
-  return (
-    <div className="grid gap-3 md:grid-cols-3">
-      {items.map(item => (
-        <Link
-          key={item.title}
-          href={item.href}
-          className="group rounded-2xl border border-[var(--border)] bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[var(--shadow-soft)]"
-        >
-          <h3 className="text-base font-bold text-[var(--foreground)] mb-1">{item.title}</h3>
-          <p className="text-sm text-[var(--muted)] leading-relaxed mb-4">{item.text}</p>
-          <span className="text-sm font-bold text-[var(--accent-dark)] group-hover:text-[var(--brand)]">
-            {item.cta} ←
-          </span>
-        </Link>
-      ))}
     </div>
   )
 }

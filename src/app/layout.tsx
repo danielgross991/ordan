@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  // No maximumScale restriction — allow users to zoom for accessibility (WCAG 2.2 AA — 1.4.4 Resize Text)
   viewportFit: 'cover',
   themeColor: '#172745',
 }

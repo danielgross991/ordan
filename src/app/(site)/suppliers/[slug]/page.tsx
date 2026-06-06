@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import { getSupplierBySlug } from '@/lib/db/suppliers'
 import { SupplierContactButtons } from './SupplierContactButtons'
 import { SupplierReportButton } from './SupplierReportButton'
+import { SupplierSectionTabs } from './SupplierSectionTabs'
 import { SupplierLogo } from '@/components/public/SupplierLogo'
 import { FavoriteButton } from '@/components/public/FavoriteButton'
 import { telLink, waLink, websiteLink } from '@/lib/utils/formatters'
@@ -128,6 +129,17 @@ export default async function SupplierPage({ params }: PageProps) {
           businessFit={supplier.businessFit}
         />
 
+        {/* ── Section tabs (sticky) ────────────────────────── */}
+        <SupplierSectionTabs
+          tabs={[
+            supplier.fullDescription ? { id: 'about', label: 'אודות' } : null,
+            supplier.businessFit.length > 0 ? { id: 'fit', label: 'מתאים ל-' } : null,
+            supplier.subcategories.length > 0 ? { id: 'fields', label: 'תחומים' } : null,
+            galleryUrls.length > 0 ? { id: 'gallery', label: 'גלריה' } : null,
+            { id: 'contact', label: 'פרטים וקשר' },
+          ].filter((t): t is { id: string; label: string } => !!t)}
+        />
+
         {/* ── Two-column layout ────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
@@ -137,43 +149,50 @@ export default async function SupplierPage({ params }: PageProps) {
             {/* Full description */}
             {supplier.fullDescription &&
               supplier.fullDescription !== supplier.shortDescription && (
-                <Section title="אודות">
-                  <p className="text-sm text-[var(--text-body)] leading-relaxed whitespace-pre-line">
-                    {supplier.fullDescription}
-                  </p>
-                </Section>
+                <div id="about" className="scroll-mt-32">
+                  <Section title="אודות">
+                    <p className="text-sm text-[var(--text-body)] leading-relaxed whitespace-pre-line">
+                      {supplier.fullDescription}
+                    </p>
+                  </Section>
+                </div>
               )}
 
             {/* Business fit */}
             {supplier.businessFit.length > 0 && (
-              <Section title="מתאים ל–">
-                <div className="flex flex-wrap gap-2">
-                  {supplier.businessFit.map(fit => (
-                    <span
-                      key={fit}
-                      className="px-3 py-1.5 bg-[var(--surface)] text-[var(--text-body)] rounded-full text-sm font-medium border border-[var(--border)]"
-                    >
-                      {fit}
-                    </span>
-                  ))}
-                </div>
-              </Section>
+              <div id="fit" className="scroll-mt-32">
+                <Section title="מתאים ל–">
+                  <div className="flex flex-wrap gap-2">
+                    {supplier.businessFit.map(fit => (
+                      <span
+                        key={fit}
+                        className="px-3 py-1.5 bg-[var(--surface)] text-[var(--text-body)] rounded-full text-sm font-medium border border-[var(--border)]"
+                      >
+                        {fit}
+                      </span>
+                    ))}
+                  </div>
+                </Section>
+              </div>
             )}
 
             {/* Subcategories */}
             {supplier.subcategories.length > 0 && (
-              <Section title="תחומים">
-                <div className="flex flex-wrap gap-2">
-                  <Chip variant="brand">{supplier.primaryCategory}</Chip>
-                  {supplier.subcategories.map(s => (
-                    <Chip key={s} variant="neutral">{s}</Chip>
-                  ))}
-                </div>
-              </Section>
+              <div id="fields" className="scroll-mt-32">
+                <Section title="תחומים">
+                  <div className="flex flex-wrap gap-2">
+                    <Chip variant="brand">{supplier.primaryCategory}</Chip>
+                    {supplier.subcategories.map(s => (
+                      <Chip key={s} variant="neutral">{s}</Chip>
+                    ))}
+                  </div>
+                </Section>
+              </div>
             )}
 
             {/* Gallery */}
             {galleryUrls.length > 0 && (
+              <div id="gallery" className="scroll-mt-32">
               <Section title="גלריה">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {galleryUrls.map((url, i) => (
@@ -192,6 +211,7 @@ export default async function SupplierPage({ params }: PageProps) {
                   ))}
                 </div>
               </Section>
+              </div>
             )}
 
             {/* Footer: last updated + report */}
@@ -207,7 +227,7 @@ export default async function SupplierPage({ params }: PageProps) {
           </div>
 
           {/* ── Sidebar ──────────────────────────────────── */}
-          <aside className="space-y-4">
+          <aside id="contact" className="space-y-4 scroll-mt-32">
 
             {/* Contact card */}
             <div className="bg-white rounded-2xl border border-[var(--border)] p-5 shadow-sm lg:sticky lg:top-24">

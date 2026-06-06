@@ -128,8 +128,8 @@ export default async function SuppliersPage({ searchParams }: PageProps) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-5 md:gap-6">
-        {/* ── Sidebar / mobile filter bar ──────────────────── */}
-        <aside className="w-full md:w-60 flex-shrink-0">
+        {/* ── Sidebar / mobile filter bar (sticky on desktop) ── */}
+        <aside className="w-full md:w-60 flex-shrink-0 md:sticky md:top-20 md:self-start md:max-h-[calc(100vh-6rem)] md:overflow-y-auto">
           <Suspense fallback={null}>
             <FilterBar categories={categories} regions={regions} />
           </Suspense>

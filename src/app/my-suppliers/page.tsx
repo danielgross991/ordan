@@ -14,36 +14,66 @@ export default async function MySupplersPage() {
 
   const suppliers = await getFavoriteSuppliers(session.user.userId!)
 
+  const userName = session.user.name?.split(' ')[0] ?? ''
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-5 md:py-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
-        <div>
-          <h1 className="text-2xl font-black text-[var(--foreground)] mb-1">הספקים שלי</h1>
-          <p className="text-sm text-[var(--muted)]">
-            {suppliers.length > 0
-              ? `${suppliers.length} ספקים שמורים`
-              : 'ספקים שתשמור יופיעו כאן'}
-          </p>
-        </div>
-        <Link
-          href="/suppliers"
-          className="inline-flex items-center justify-center px-4 py-2.5 bg-[var(--brand)] text-white rounded-xl text-sm font-medium hover:bg-[var(--brand-dark)] transition-colors"
-        >
-          גלה ספקים
-        </Link>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-black text-[var(--foreground)] mb-1">
+          {userName ? `שלום ${userName}` : 'הלוח שלי'}
+        </h1>
+        <p className="text-sm text-[var(--muted)]">
+          {suppliers.length > 0
+            ? `${suppliers.length} ספקים שמורים בלוח שלך`
+            : 'נהל את הספקים האהובים והפעולות שלך במקום אחד'}
+        </p>
       </div>
 
-      {suppliers.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
-          {suppliers.map(s => (
-            <SupplierCardComponent key={s.id} supplier={s} />
-          ))}
+      {/* Quick actions */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+        <QuickAction href="/suppliers" icon="🔍" label="גלה ספקים" />
+        <QuickAction href="/map" icon="🗺️" label="מפת אזורים" />
+        <QuickAction href="/suppliers?featured=true" icon="✦" label="מובחרים" />
+        <QuickAction href="mailto:hello@ordan.co.il" icon="✉️" label="צור קשר" />
+      </div>
+
+      {/* Favorites section */}
+      <section>
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="text-lg md:text-xl font-bold text-[var(--foreground)]">
+            ספקים שמורים
+          </h2>
+          {suppliers.length > 0 && (
+            <Link href="/suppliers" className="text-sm text-[var(--accent)] font-medium hover:text-[var(--accent-dark)]">
+              גלה עוד →
+            </Link>
+          )}
         </div>
-      )}
+
+        {suppliers.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+            {suppliers.map(s => (
+              <SupplierCardComponent key={s.id} supplier={s} />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
+  )
+}
+
+function QuickAction({ href, icon, label }: { href: string; icon: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2.5 bg-white border border-[var(--border)] rounded-2xl px-3 py-3 shadow-sm hover:border-[var(--accent)] hover:shadow-[var(--shadow-soft)] active:scale-95 transition-all min-h-[56px]"
+    >
+      <span className="text-xl flex-shrink-0">{icon}</span>
+      <span className="text-sm font-semibold text-[var(--foreground)] truncate">{label}</span>
+    </Link>
   )
 }
 
