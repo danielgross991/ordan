@@ -153,7 +153,7 @@ export const authOptions: NextAuthOptions = {
       return true
     },
 
-    async jwt({ token, account }) {
+    async jwt({ token, account, trigger }) {
       if (account?.provider === 'google' && token.email) {
         // First sign-in: load role from DB
         try {
@@ -171,6 +171,18 @@ export const authOptions: NextAuthOptions = {
         token.role = 'admin'
         token.userId = '1'
         token.onboardingComplete = true
+      } else if (trigger === 'update' && token.email && !token.isAdmin) {
+        // Client called session.update() — refetch role/onboarding from DB
+        try {
+          const dbUser = await getUserByEmail(token.email as string)
+          if (dbUser) {
+            token.role = dbUser.role
+            token.userId = dbUser.id
+            token.onboardingComplete = dbUser.onboardingComplete
+          }
+        } catch {
+          // keep existing token
+        }
       }
 
       return token
