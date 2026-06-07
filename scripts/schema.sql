@@ -101,8 +101,30 @@ CREATE TABLE IF NOT EXISTS buyer_profiles (
   city                 TEXT,
   region               TEXT,
   category_preferences TEXT[] NOT NULL DEFAULT '{}',
+  -- Google Places fields (populated when address picked via autocomplete)
+  address              TEXT,
+  place_id             TEXT,
+  lat                  NUMERIC(10, 6),
+  lng                  NUMERIC(10, 6),
   created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Idempotent column adds for existing deployments
+ALTER TABLE buyer_profiles ADD COLUMN IF NOT EXISTS address  TEXT;
+ALTER TABLE buyer_profiles ADD COLUMN IF NOT EXISTS place_id TEXT;
+ALTER TABLE buyer_profiles ADD COLUMN IF NOT EXISTS lat      NUMERIC(10, 6);
+ALTER TABLE buyer_profiles ADD COLUMN IF NOT EXISTS lng      NUMERIC(10, 6);
+
+-- ── Supplier profiles (business info supplied at signup) ─────────────────────
+CREATE TABLE IF NOT EXISTS supplier_profiles (
+  user_id             TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  business_name       TEXT,
+  categories          TEXT[] NOT NULL DEFAULT '{}',
+  linked_supplier_id  TEXT REFERENCES suppliers(id) ON DELETE SET NULL,
+  linked_at           TIMESTAMPTZ,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- ── Supplier claims (link Google user to a supplier profile) ─────────────────

@@ -45,7 +45,7 @@ export function RoleSelectClient() {
       // Update session token with new role
       await update({ role: selected, onboardingComplete: false })
 
-      router.push(selected === 'supplier' ? '/dashboard' : '/')
+      router.push('/onboarding/profile')
     } catch {
       setError('שגיאה. נסה שוב.')
       setLoading(false)

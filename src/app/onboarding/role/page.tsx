@@ -9,7 +9,10 @@ export default async function OnboardingRolePage() {
 
   if (!session?.user) redirect('/login')
   if (session.user.isAdmin) redirect('/admin')
-  if (session.user.role && session.user.role !== 'pending') redirect('/')
+  // Already picked a role: jump to profile step if incomplete, otherwise home
+  if (session.user.role && session.user.role !== 'pending') {
+    redirect(session.user.onboardingComplete ? '/' : '/onboarding/profile')
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col items-center justify-center px-4">
