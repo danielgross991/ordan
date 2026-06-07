@@ -32,17 +32,18 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
 
       <main>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white pt-12 md:pt-20 pb-20 md:pb-32 px-4">
+      <section className="relative overflow-hidden bg-white pt-10 md:pt-16 pb-16 md:pb-28 px-4">
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(60% 50% at 20% 0%, var(--brand-light) 0%, transparent 60%), radial-gradient(45% 40% at 95% 30%, var(--accent-light) 0%, transparent 65%)',
+              'radial-gradient(60% 50% at 15% 0%, var(--brand-light) 0%, transparent 60%), radial-gradient(45% 45% at 95% 25%, var(--accent-light) 0%, transparent 65%)',
           }}
         />
-        <div className="relative max-w-6xl mx-auto">
-          <div className="max-w-3xl">
+        <div className="relative max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
+          {/* Copy column */}
+          <div className="order-1">
             <FadeInOnScroll>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[var(--border)] text-xs font-bold text-[var(--brand)] shadow-sm mb-6">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -51,14 +52,14 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
             </FadeInOnScroll>
 
             <FadeInOnScroll delay={80}>
-              <h1 className="text-[2.75rem] sm:text-6xl lg:text-7xl font-black leading-[1.02] tracking-tight text-[var(--foreground)] mb-6">
+              <h1 className="text-[2.75rem] sm:text-6xl lg:text-[4.5rem] font-black leading-[1.02] tracking-tight text-[var(--foreground)] mb-6">
                 הספק הנכון.<br />
                 <span className="text-[var(--accent)]">בלחיצה אחת.</span>
               </h1>
             </FadeInOnScroll>
 
             <FadeInOnScroll delay={160}>
-              <p className="text-lg md:text-2xl text-[var(--muted)] max-w-2xl leading-relaxed mb-10 font-medium">
+              <p className="text-lg md:text-2xl text-[var(--muted)] max-w-xl leading-relaxed mb-10 font-medium">
                 פלטפורמת ה-B2B המובילה למסעדנים, מלונאים וקייטרינג בישראל.<br className="hidden md:block" />
                 ספקי מזון, ציוד וניקיון — מאומתים, מסוננים, מותאמים אליך.
               </p>
@@ -83,13 +84,18 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
             </FadeInOnScroll>
 
             <FadeInOnScroll delay={340}>
-              <div className="mt-14 grid grid-cols-3 gap-4 md:gap-10 max-w-2xl">
+              <div className="mt-12 grid grid-cols-3 gap-4 md:gap-8 max-w-md">
                 <Stat label="ספקים פעילים" value={supplierCount} />
                 <Stat label="קטגוריות" value={categoryCount} />
                 <Stat label="אזורי שירות" value={regionCount} />
               </div>
             </FadeInOnScroll>
           </div>
+
+          {/* Visual column */}
+          <FadeInOnScroll delay={120} direction="left">
+            <HeroVisual supplierCount={supplierCount} />
+          </FadeInOnScroll>
         </div>
       </section>
 
@@ -121,24 +127,26 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
             </div>
           </FadeInOnScroll>
 
-          {/* Big feature row */}
+          {/* Big feature row — photo cards (Wolt-style) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
             <FadeInOnScroll delay={0}>
-              <BigFeature
+              <ImageFeature
                 tag="חיפוש"
                 title="מנוע חיפוש חכם"
-                description="התחל להקליד וקבל הצעות חיות מספקים, קטגוריות ואזורים. סינון מתקדם לפי סוג עסק, כשרות, אזורי אספקה, ומאומתים בלבד."
+                description="התחל להקליד וקבל הצעות חיות מספקים, קטגוריות ואזורים. סינון מתקדם לפי סוג עסק, כשרות ומאומתים בלבד."
                 icon={<SearchIcon />}
-                bgClass="bg-[var(--brand-light)]"
+                image="/landing/kitchen.jpg"
+                imageAlt="צוות מטבח עובד מול חומרי גלם טריים"
               />
             </FadeInOnScroll>
             <FadeInOnScroll delay={120}>
-              <BigFeature
+              <ImageFeature
                 tag="גילוי"
                 title="מפת ישראל חיה"
-                description="מפה אינטראקטיבית של אזורי האספקה בישראל. לחץ על אזור ותראה מיד מי מספק לשם — בלי לחפש."
+                description="מפה אינטראקטיבית של אזורי האספקה. לחץ על אזור ותראה מיד מי מספק לשם — בלי לחפש."
                 icon={<MapIcon />}
-                bgClass="bg-[var(--accent-light)]"
+                image="/landing/restaurant.jpg"
+                imageAlt="פנים של מסעדה מעוצבת"
               />
             </FadeInOnScroll>
           </div>
@@ -163,38 +171,67 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
 
       {/* ── HOW IT WORKS ──────────────────────────────────────── */}
       <section id="how-it-works" className="py-20 md:py-32 px-4 bg-[var(--background)] scroll-mt-16">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-16 items-start">
+          {/* Sticky image */}
           <FadeInOnScroll>
-            <div className="text-center mb-14 md:mb-20">
-              <span className="inline-block text-xs font-black uppercase tracking-[0.15em] text-[var(--accent)] mb-4">
-                התחלה ב-3 שלבים
-              </span>
-              <h2 className="text-4xl md:text-6xl font-black text-[var(--foreground)] tracking-tight leading-[1.05]">
-                פשוט. מהיר.<br />
-                <span className="text-[var(--brand)]">חינם.</span>
-              </h2>
+            <div className="lg:sticky lg:top-24">
+              <div className="relative rounded-[2rem] overflow-hidden shadow-[var(--shadow-soft)] aspect-[4/5]">
+                <img
+                  src="/landing/produce.jpg"
+                  alt="מדפי ירקות ופירות טריים אצל ספק"
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div
+                  aria-hidden
+                  className="absolute inset-0"
+                  style={{ background: 'linear-gradient(180deg, transparent 40%, rgba(23,39,69,0.55) 100%)' }}
+                />
+                <div className="absolute bottom-5 right-5 left-5 flex items-center gap-3 rounded-2xl bg-white/95 backdrop-blur px-4 py-3 shadow-lg">
+                  <span className="flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--accent-light)] text-[var(--accent)] flex items-center justify-center">
+                    <SparklesIcon />
+                  </span>
+                  <p className="text-sm font-bold text-[var(--foreground)] leading-tight">
+                    מאלפי מוצרים — לספק אחד מדויק
+                  </p>
+                </div>
+              </div>
             </div>
           </FadeInOnScroll>
 
-          <div className="space-y-4 md:space-y-6">
-            <StepRow
-              number="1"
-              title="התחבר עם Google"
-              description="10 שניות, ללא טפסים מסובכים, ללא סיסמאות. כניסה מאובטחת עם החשבון שכבר יש לך."
-              direction="right"
-            />
-            <StepRow
-              number="2"
-              title="ספר על העסק שלך"
-              description="שם המסעדה, מיקום, ואיזה ספקים אתה מחפש. נתאים את התוכן בדיוק לצרכים שלך."
-              direction="left"
-            />
-            <StepRow
-              number="3"
-              title="גלה, סנן, התקשר"
-              description="חיפוש לפי אזור, קטגוריה, סוג עסק — וצור קשר ישיר עם הספק בטלפון או ווצאפ."
-              direction="right"
-            />
+          <div>
+            <FadeInOnScroll>
+              <div className="mb-10 md:mb-12">
+                <span className="inline-block text-xs font-black uppercase tracking-[0.15em] text-[var(--accent)] mb-4">
+                  התחלה ב-3 שלבים
+                </span>
+                <h2 className="text-4xl md:text-6xl font-black text-[var(--foreground)] tracking-tight leading-[1.05]">
+                  פשוט. מהיר.<br />
+                  <span className="text-[var(--brand)]">חינם.</span>
+                </h2>
+              </div>
+            </FadeInOnScroll>
+
+            <div className="space-y-4 md:space-y-6">
+              <StepRow
+                number="1"
+                title="התחבר עם Google"
+                description="10 שניות, ללא טפסים מסובכים, ללא סיסמאות. כניסה מאובטחת עם החשבון שכבר יש לך."
+                direction="right"
+              />
+              <StepRow
+                number="2"
+                title="ספר על העסק שלך"
+                description="שם המסעדה, מיקום, ואיזה ספקים אתה מחפש. נתאים את התוכן בדיוק לצרכים שלך."
+                direction="left"
+              />
+              <StepRow
+                number="3"
+                title="גלה, סנן, התקשר"
+                description="חיפוש לפי אזור, קטגוריה, סוג עסק — וצור קשר ישיר עם הספק בטלפון או ווצאפ."
+                direction="right"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -209,8 +246,29 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
               'radial-gradient(60% 50% at 80% 50%, var(--accent) 0%, transparent 60%), radial-gradient(40% 40% at 10% 80%, var(--brand-mid) 0%, transparent 60%)',
           }}
         />
-        <div className="relative max-w-4xl mx-auto text-center">
-          <FadeInOnScroll>
+        <div className="relative max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+          {/* Chef image */}
+          <FadeInOnScroll direction="right">
+            <div className="relative rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/3] lg:aspect-[5/6]">
+              <img
+                src="/landing/chef.jpg"
+                alt="שף מסדר מנה במטבח מקצועי"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(160deg, transparent 45%, rgba(27,47,80,0.5) 100%)' }}
+              />
+              <div className="absolute top-5 right-5 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur px-3.5 py-1.5 text-xs font-black text-[var(--brand)] shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                חשיפה לאלפי עסקים
+              </div>
+            </div>
+          </FadeInOnScroll>
+
+          <FadeInOnScroll direction="left">
             <span className="inline-block text-xs font-black uppercase tracking-[0.15em] text-[var(--accent-light)] mb-4">
               לספקים
             </span>
@@ -218,7 +276,7 @@ export function LandingPage({ supplierCount, categoryCount, regionCount, supplie
               אתה ספק? בוא תוכר<br />
               ע&quot;י אלפי עסקי מזון.
             </h2>
-            <p className="text-lg md:text-xl text-blue-100/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-blue-100/90 mb-10 max-w-xl leading-relaxed">
               הצג את הקטגוריות שאתה מכסה ואת אזורי האספקה. מסעדנים ומלונאים ימצאו אותך בדיוק כשהם צריכים — ללא עמלות, ללא דמי חברות.
             </p>
             <Link
@@ -280,33 +338,91 @@ function Stat({ label, value }: { label: string; value: number }) {
   )
 }
 
-function BigFeature({
+/**
+ * Wolt-style hero visual: large rounded food photo with floating
+ * "verified" trust card and a small accent thumbnail.
+ */
+function HeroVisual({ supplierCount }: { supplierCount: number }) {
+  return (
+    <div className="relative order-2 mx-auto w-full max-w-md lg:max-w-none">
+      {/* Main image */}
+      <div className="relative rounded-[2.25rem] overflow-hidden shadow-[0_30px_60px_-20px_rgba(23,39,69,0.35)] aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5]">
+        <img
+          src="/landing/hero-food.jpg"
+          alt="מנות מסעדה מוגשות על שולחן עץ"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(180deg, rgba(23,39,69,0.10) 0%, transparent 35%, rgba(23,39,69,0.35) 100%)' }}
+        />
+      </div>
+
+      {/* Floating verified card (bottom-start) */}
+      <div className="absolute -bottom-5 right-4 sm:-right-5 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 shadow-[0_20px_45px_-15px_rgba(23,39,69,0.45)] border border-[var(--border)]/70">
+        <span className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+        </span>
+        <div>
+          <div className="text-sm font-black text-[var(--foreground)] leading-tight">100% מאומתים</div>
+          <div className="text-[11px] text-[var(--muted)] font-semibold">כל ספק נבדק ידנית</div>
+        </div>
+      </div>
+
+      {/* Floating live count chip (top-end) */}
+      <div className="absolute -top-3 left-4 sm:-left-4 inline-flex items-center gap-2 rounded-full bg-[var(--brand)] text-white px-4 py-2 text-sm font-bold shadow-lg">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        {supplierCount}+ ספקים
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Wolt-style photo feature card: full-bleed image with a dark gradient
+ * and copy anchored to the bottom.
+ */
+function ImageFeature({
   tag,
   title,
   description,
   icon,
-  bgClass,
+  image,
+  imageAlt,
 }: {
   tag: string
   title: string
   description: string
   icon: React.ReactNode
-  bgClass: string
+  image: string
+  imageAlt: string
 }) {
   return (
-    <div className={`group h-full ${bgClass} rounded-3xl p-7 md:p-9 hover:-translate-y-1 transition-all duration-300 border border-[var(--border)]/50 overflow-hidden relative`}>
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(50% 50% at 80% 20%, rgba(255,255,255,0.5) 0%, transparent 60%)' }}
+    <div className="group relative h-full min-h-[340px] md:min-h-[420px] rounded-3xl overflow-hidden shadow-[var(--shadow-soft)]">
+      <img
+        src={image}
+        alt={imageAlt}
+        loading="lazy"
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
-      <div className="relative">
-        <span className="inline-block text-[11px] font-black uppercase tracking-[0.15em] text-[var(--brand)]/70 mb-5">
-          {tag}
-        </span>
-        <div className="w-14 h-14 rounded-2xl bg-white text-[var(--brand)] flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: 'linear-gradient(180deg, rgba(23,39,69,0.05) 0%, rgba(23,39,69,0.35) 45%, rgba(23,39,69,0.88) 100%)' }}
+      />
+      <div className="relative h-full flex flex-col justify-end p-7 md:p-9">
+        <div className="w-13 h-13 md:w-14 md:h-14 rounded-2xl bg-white/15 backdrop-blur text-white flex items-center justify-center mb-5 ring-1 ring-white/25">
           {icon}
         </div>
-        <h3 className="text-2xl md:text-3xl font-black text-[var(--foreground)] mb-3 leading-tight">{title}</h3>
-        <p className="text-base text-[var(--muted)] leading-relaxed">{description}</p>
+        <span className="inline-block text-[11px] font-black uppercase tracking-[0.18em] text-[var(--accent-light)] mb-2">
+          {tag}
+        </span>
+        <h3 className="text-2xl md:text-3xl font-black text-white mb-2.5 leading-tight">{title}</h3>
+        <p className="text-base text-white/85 leading-relaxed max-w-md">{description}</p>
       </div>
     </div>
   )
