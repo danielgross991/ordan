@@ -1,7 +1,10 @@
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth/options'
 import { SearchBar } from '@/components/public/SearchBar'
 import { CategoryIcon } from '@/components/public/CategoryIcon'
 import { LogoMarquee } from '@/components/public/LogoMarquee'
+import { LandingPage } from '@/components/landing/LandingPage'
 import { getActiveCategories } from '@/lib/db/categories'
 import { getActiveRegions } from '@/lib/db/regions'
 import { getPublishedSuppliers } from '@/lib/db/suppliers'
@@ -13,11 +16,24 @@ import type { SupplierCard } from '@/lib/domain/supplier'
 export const revalidate = 300
 
 export default async function HomePage() {
+  const session = await getServerSession(authOptions)
   const [categories, regions, allSuppliers] = await Promise.all([
     getActiveCategories(),
     getActiveRegions(),
     getPublishedSuppliers({ query: '' }),
   ])
+
+  // Show marketing landing for non-logged-in visitors
+  if (!session?.user) {
+    return (
+      <LandingPage
+        supplierCount={allSuppliers.length}
+        categoryCount={categories.length}
+        regionCount={regions.length}
+        suppliers={allSuppliers}
+      />
+    )
+  }
 
   const featuredSuppliers = allSuppliers.filter(s => s.featured).slice(0, 10)
   const recentSuppliers = [...allSuppliers].slice(0, 10)
