@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 const navItems = [
   { href: '/admin', label: '📊 לוח בקרה', exact: true },
   { href: '/admin/suppliers', label: '🏪 ספקים' },
+  { href: '/admin/users', label: '👥 משתמשים' },
   { href: '/admin/categories', label: '🗂 קטגוריות' },
   { href: '/admin/regions', label: '📍 אזורים' },
   { href: '/admin/import/csv', label: '📁 יבוא CSV' },

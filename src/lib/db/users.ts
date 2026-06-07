@@ -91,3 +91,39 @@ export async function markOnboardingComplete(userId: string): Promise<void> {
     WHERE id = ${userId}
   `
 }
+
+export interface UserListRow extends DbUser {
+  favoriteCount: number
+}
+
+export async function listAllUsers(): Promise<UserListRow[]> {
+  const sql = getSql()
+  if (!sql) return []
+  const rows = await sql`
+    SELECT u.*, COALESCE(f.cnt, 0) AS favorite_count
+    FROM users u
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM favorites GROUP BY user_id
+    ) f ON f.user_id = u.id
+    ORDER BY u.created_at DESC
+  `
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return rows.map((row: any) => ({ ...toUser(row), favoriteCount: Number(row.favorite_count ?? 0) }))
+}
+
+export async function deleteUserById(userId: string): Promise<void> {
+  const sql = getSql()
+  if (!sql) return
+  await sql`DELETE FROM users WHERE id = ${userId}`
+}
+
+export async function resetUserOnboarding(userId: string): Promise<void> {
+  const sql = getSql()
+  if (!sql) return
+  await sql`
+    UPDATE users SET role = 'pending', onboarding_complete = FALSE, updated_at = NOW()
+    WHERE id = ${userId}
+  `
+  await sql`DELETE FROM buyer_profiles    WHERE user_id = ${userId}`
+  await sql`DELETE FROM supplier_profiles WHERE user_id = ${userId}`
+}
