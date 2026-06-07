@@ -63,8 +63,10 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Always run bcrypt to keep timing constant whether username matches or not.
-        // Use a dummy hash of equivalent cost when the username is wrong.
-        const dummyHash = '$2b$10$abcdefghijklmnopqrstuv1234567890abcdefghijklmnopqrstuvwxyz'
+        // Must be a *valid* bcrypt hash (cost 10) — a malformed string makes
+        // bcrypt.compare short-circuit in ~0ms, leaking (via timing) whether the
+        // username was correct. This hash is of a random value and matches nothing.
+        const dummyHash = '$2b$10$5hbX3qfM..54DIKheHoKNe1yUCJfZj/nDHeOnPGvtX7BUOYVTu5Cu'
         const usernameMatches = credentials.username === expectedUsername
         const hashToCompare = usernameMatches ? expectedHash : dummyHash
         const valid = await bcrypt.compare(credentials.password, hashToCompare)

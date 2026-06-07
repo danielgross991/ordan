@@ -33,11 +33,33 @@ const MAX_HTML_BYTES = 1_000_000
 const BLOCKED_HOSTS = new Set(['localhost', '0.0.0.0'])
 
 function isPrivateAddress(address: string): boolean {
-  if (address === '127.0.0.1' || address === '::1') return true
-  if (address.startsWith('10.') || address.startsWith('192.168.')) return true
-  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(address)) return true
-  if (address.startsWith('169.254.')) return true
-  if (address.startsWith('fc') || address.startsWith('fd') || address.startsWith('fe80')) return true
+  let addr = address.toLowerCase().trim()
+
+  // Unwrap IPv4-mapped IPv6 so the embedded IPv4 is range-checked too
+  // (e.g. ::ffff:127.0.0.1 and its hex form ::ffff:7f00:1).
+  const mappedDotted = addr.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/)
+  if (mappedDotted) {
+    addr = mappedDotted[1]
+  } else {
+    const mappedHex = addr.match(/^::ffff:([0-9a-f]{1,4}):([0-9a-f]{1,4})$/)
+    if (mappedHex) {
+      const hi = parseInt(mappedHex[1], 16)
+      const lo = parseInt(mappedHex[2], 16)
+      addr = `${(hi >> 8) & 255}.${hi & 255}.${(lo >> 8) & 255}.${lo & 255}`
+    }
+  }
+
+  // IPv6 loopback / unspecified / unique-local / link-local
+  if (addr === '::1' || addr === '::') return true
+  if (addr.startsWith('fc') || addr.startsWith('fd') || addr.startsWith('fe80')) return true
+
+  // IPv4 reserved / private ranges
+  if (addr.startsWith('127.')) return true                                 // loopback 127.0.0.0/8
+  if (addr.startsWith('0.')) return true                                   // "this" network 0.0.0.0/8
+  if (addr.startsWith('10.') || addr.startsWith('192.168.')) return true   // private
+  if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(addr)) return true               // 172.16.0.0/12
+  if (/^100\.(6[4-9]|[7-9]\d|1[0-1]\d|12[0-7])\./.test(addr)) return true // CGNAT 100.64.0.0/10
+  if (addr.startsWith('169.254.')) return true                            // link-local + cloud metadata
   return false
 }
 
