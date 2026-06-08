@@ -125,7 +125,12 @@ export async function getSupplierBySlug(rawSlug: string): Promise<Supplier | nul
   `
   if (rows.length === 0) return null
   const supplier = toSupplier(rows[0])
-  return isPubliclyVisible(supplier) ? supplier : null
+  if (!isPubliclyVisible(supplier)) return null
+  // Strip internal-only provenance fields. This object is rendered on the public
+  // detail page and passed to Client Components (e.g. SupplierContactButtons), so
+  // every field on it is serialized into the public RSC/HTML payload. source_type
+  // and source_url must never reach the browser.
+  return { ...supplier, sourceType: null, sourceUrl: null }
 }
 
 /** Admin: get all suppliers regardless of status */
